@@ -112,11 +112,15 @@ namespace Battle_Ship
         public int CombatRound { get; set; }
         public int SizeOcean { get; set; }
         public Point Target { get; set; }
+        public bool TargetJustAttacked { get; set; }
+        public Random rng { get; set; }
 
         public Grid()
         {
             //Size of ocean
-            this.SizeOcean = 10;
+            this.rng = new Random();
+            this.TargetJustAttacked = false;
+            this.SizeOcean = 13;
             this.Ocean = new Point[SizeOcean, SizeOcean];
 
             //create the target
@@ -156,13 +160,61 @@ namespace Battle_Ship
             this.PlaceShip(Minesweeper, PlaceShipDirection.Vertical, 4, 0);
 
             //call on all of ships above
+
+            //place ships randomly within the ocean.
+            foreach (Ship item in ListOfShips)
+            {
+                
+
+
+                
+            }
             
         }
 
-        public void PlaceShip(Ship shipToPlace, PlaceShipDirection direction, int startX, int startY)
+        public void PlaceShip(Ship shipToPlace)
         {
+            int placementX = 0; int placementY = 0;
+
+            int Horizontal = (int)PlaceShipDirection.Horizontal;
+            int Vertical = (int)PlaceShipDirection.Vertical;
+
+            //random numbers to be used for {0}horizontal or {1} vertica; placement
+            int Random = rng.Next(0, 2);
+            
+            //random numbers to be used for startX and startY
+            int randomX = rng.Next(0, SizeOcean);
+            int randomY = rng.Next(0, SizeOcean);
+
+            //bool set to false if there is already a ship in the position
+            bool currentShipPlace = false;
+
             for (int i = 0; i < shipToPlace.Length; i++)
             {
+                //gets all of the occupied points of the ships within the list of ships
+                //used for cross checking new ship placement
+                
+
+                foreach (Ship points in ListOfShips)
+                {
+                    foreach (Point inside in points.OccupiedPoints)
+                    {
+                        if (inside.XAxis == placementX && inside.YAxis == placementY)
+                        {
+                            //if this is true that means there is already a ship here and new start points must be entered.
+                            currentShipPlace = true;
+                            break;
+                        }
+                    }
+                    if (currentShipPlace)
+                    {
+                        break;
+                    }
+                }
+                //checks all ships against the starting point, if there where no coinciding points then it is a safe starting point
+                //now we need to change the next point to check for the placement ship. This is where we need to consider horizontal or vertical
+                
+                //if there is no current ship place corisponding to future place of the chip to be placed... place the ship
                 //set starting point to ship
                 Ocean[startX, startY].PointStatus = Point.Status.Ship;
 
@@ -184,37 +236,55 @@ namespace Battle_Ship
         {
             
             Console.Clear();
-            Console.Write("  ");
+            Console.Write("   ");
             for (int i = 0; i < SizeOcean; i++)
             {
-                Console.Write(" " + i + " ");
+                if (i > 9)
+	            {
+                    if (i == 10)
+                    {
+                        Console.Write("  ");
+                    }
+		            Console.Write(i + "  ");
+	            }
+                else
+                {
+                    Console.Write("  " + i + " "); 
+                }
             }
             Console.WriteLine();
             for (int y = 0; y < SizeOcean; y++)
             {
+                if (y < 10)
+                {
+                    Console.Write(" ");
+                }
                 Console.Write(y);
                 Console.Write("|");
                 for (int x = 0; x < SizeOcean; x++)
                 {
-                    if (this.Target.XAxis == x && this.Target.YAxis == y)
                     {
-                        Console.Write("[X]");
+                        Console.Write(" ");
+                    }
+                    if (this.Target.XAxis == x && this.Target.YAxis == y && !TargetJustAttacked)
+                    {
+                        Console.Write(" X ");
                     }
                     else if (Ocean[x, y].PointStatus == Point.Status.Empty)
                     {
-                        Console.Write("[ ]");
+                        Console.Write("/~/");
                     }
                     else if (Ocean[x, y].PointStatus == Point.Status.Ship)
                     {
-                        Console.Write("[S]");
+                        Console.Write("/~/");
                     }
                     else if (Ocean[x, y].PointStatus == Point.Status.Hit)
                     {
-                        Console.Write("[H]");
+                        Console.Write("/!/");
                     }
                     else if (Ocean[x, y].PointStatus == Point.Status.Miss)
                     {
-                        Console.Write("[O]");
+                        Console.Write("   ");
                     }
                     else
                     {
@@ -231,30 +301,10 @@ namespace Battle_Ship
                 }
                 Console.WriteLine();
             }
+            TargetJustAttacked = false;
         }
 
-        public bool TargetInput(int x, int y)
-        {
-            int numberOfShipsDestroyed = this.ListOfShips.Where(j => j.IsDestroyed).Count();
-
-            Point theTarget = Ocean[x, y];
-            if (theTarget.PointStatus == Point.Status.Ship)
-            {
-                Ocean[x, y].PointStatus = Point.Status.Hit;
-            }
-            else if (theTarget.PointStatus == Point.Status.Empty)
-            {
-                Ocean[x, y].PointStatus = Point.Status.Miss;
-            }
-
-            int newNumberOfShipsDestryoed = this.ListOfShips.Where(j => j.IsDestroyed).Count();
-            if (numberOfShipsDestroyed < newNumberOfShipsDestryoed)
-            {
-                return true;
-            }
-            return false;
-        }
-
+        
         public int GetUserMove()
         {
             //returning an integer for move, if up then 1, if 
@@ -294,6 +344,10 @@ namespace Battle_Ship
                     gettingInput = false;
                     return 4;
                 }
+                else if (input == ConsoleKey.Spacebar)
+                {
+                    return 10;
+                }
                 else
                 {
                     Console.WriteLine("Press up arrow, down arrow, left arrow, right arrow.");
@@ -305,43 +359,89 @@ namespace Battle_Ship
 
         public void MoveTarget(int input)
         {
-            int move = input;
+            if (input != 10)
+            {
+                int move = input;
 
-            int targetX = this.Target.XAxis; int targetY = this.Target.YAxis;
+                int targetX = this.Target.XAxis; int targetY = this.Target.YAxis;
 
-            //Down
-            if (input == 3 && (targetY + 1) < SizeOcean)
-            {
-                targetY++;
-            }
-            //Up
-            else if (input == 1 && (targetY - 1) >= 0)
-            {
-                targetY--;
-            }
-            //Right
-            else if (input == 2 && (targetX + 1) < SizeOcean)
-            {
-                targetX++;
-            }
-            //Left
-            else if (input == 4 && (targetX - 1) >= 0)
-            {
-                targetX--;
-            }
+                //Down
+                if (input == 3 && (targetY + 1) < SizeOcean)
+                {
+                    targetY++;
+                }
+                //Up
+                else if (input == 1 && (targetY - 1) >= 0)
+                {
+                    targetY--;
+                }
+                //Right
+                else if (input == 2 && (targetX + 1) < SizeOcean)
+                {
+                    targetX++;
+                }
+                //Left
+                else if (input == 4 && (targetX - 1) >= 0)
+                {
+                    targetX--;
+                }
 
-            this.Target.XAxis = targetX;
-            this.Target.YAxis = targetY;
+                this.Target.XAxis = targetX;
+                this.Target.YAxis = targetY; 
+            }
+        }
+
+        public bool WasHit(int userMove)
+        {
+            if (userMove == 10)
+            {
+                TargetJustAttacked = true;
+                if (Ocean[this.Target.XAxis, this.Target.YAxis].PointStatus == Point.Status.Ship)
+                {
+                    Ocean[this.Target.XAxis, this.Target.YAxis].PointStatus = Point.Status.Hit;
+                    Console.WriteLine("You hit!");
+                    return true;
+                }
+                else if (Ocean[this.Target.XAxis, this.Target.YAxis].PointStatus == Point.Status.Empty)
+                {
+                    Ocean[this.Target.XAxis, this.Target.YAxis].PointStatus = Point.Status.Miss;
+                    Console.WriteLine("You missed");
+                } 
+            }
+            
+            return false;
+        }
+
+        public bool ValidUserAttack()
+        {
+            ConsoleKey input = Console.ReadKey().Key;
+            if (input == ConsoleKey.Spacebar)
+            {
+                return true;
+            }
+            else
+            {
+                Console.WriteLine("Not a valid entry");
+            }
+            return false;
         }
 
         public void PlayGame()
         {
+            int userMove = 0;
             while (!AllShipsDestroyed)
             {
                 this.DisplayOcean();
-                this.MoveTarget(this.GetUserMove());
+                userMove = this.GetUserMove();
+                this.MoveTarget(userMove);
+
+                if (WasHit(userMove))
+                {
+
+                }
                 
             }
+            
         }
 
 

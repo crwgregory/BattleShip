@@ -4,3 +4,9 @@ C:\Users\Technologist SP\Documents\GitHub\BattleShip\Battle Ship\Battle Ship\bin
 C:\Users\Technologist SP\Documents\GitHub\BattleShip\Battle Ship\Battle Ship\obj\Debug\Battle Ship.csprojResolveAssemblyReference.cache
 C:\Users\Technologist SP\Documents\GitHub\BattleShip\Battle Ship\Battle Ship\obj\Debug\Battle Ship.exe
 C:\Users\Technologist SP\Documents\GitHub\BattleShip\Battle Ship\Battle Ship\obj\Debug\Battle Ship.pdb
+C:\Users\Greg Christopherson\Documents\GitHub\BattleShip\Battle Ship\Battle Ship\bin\Debug\Battle Ship.exe.config
+C:\Users\Greg Christopherson\Documents\GitHub\BattleShip\Battle Ship\Battle Ship\obj\Debug\Battle Ship.exe
+C:\Users\Greg Christopherson\Documents\GitHub\BattleShip\Battle Ship\Battle Ship\obj\Debug\Battle Ship.pdb
+C:\Users\Greg Christopherson\Documents\GitHub\BattleShip\Battle Ship\Battle Ship\bin\Debug\Battle Ship.exe
+C:\Users\Greg Christopherson\Documents\GitHub\BattleShip\Battle Ship\Battle Ship\bin\Debug\Battle Ship.pdb
+C:\Users\Greg Christopherson\Documents\GitHub\BattleShip\Battle Ship\Battle Ship\obj\Debug\Battle Ship.csprojResolveAssemblyReference.cache
