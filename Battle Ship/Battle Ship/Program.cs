@@ -182,54 +182,88 @@ namespace Battle_Ship
             //random numbers to be used for {0}horizontal or {1} vertica; placement
             int Random = rng.Next(0, 2);
             
-            //random numbers to be used for startX and startY
-            int randomX = rng.Next(0, SizeOcean);
-            int randomY = rng.Next(0, SizeOcean);
+            
 
             //bool set to false if there is already a ship in the position
             bool currentShipPlace = false;
 
-            for (int i = 0; i < shipToPlace.Length; i++)
-            {
-                //gets all of the occupied points of the ships within the list of ships
-                //used for cross checking new ship placement
-                
+            //if this currentShipPlace gets set to true at anytime during the check it will loop again and get new starting numbers
+            //loops again if it can't place ship
+            for (int x = 0; x < 100; x++)
+			{
 
-                foreach (Ship points in ListOfShips)
+                //random numbers to be used for startX and startY
+                int randomX = rng.Next(0, SizeOcean);
+                int randomY = rng.Next(0, SizeOcean);
+			
+                for (int i = 0; i < shipToPlace.Length; i++)
                 {
-                    foreach (Point inside in points.OccupiedPoints)
+                    //gets all of the occupied points of the ships within the list of ships
+                    //used for cross checking new ship placement
+
+
+                    foreach (Ship points in ListOfShips)
                     {
-                        if (inside.XAxis == placementX && inside.YAxis == placementY)
+                        foreach (Point inside in points.OccupiedPoints)
                         {
-                            //if this is true that means there is already a ship here and new start points must be entered.
-                            currentShipPlace = true;
+                            if (inside.XAxis == placementX && inside.YAxis == placementY)
+                            {
+                                //if this is true that means there is already a ship here and new start points must be entered.
+                                currentShipPlace = true;
+                                break;
+                            }
+                        }
+                        if (currentShipPlace)
+                        {
                             break;
                         }
+                       
                     }
+
+                    //if current ship place has been set to true, we need to get new starting point numbers
                     if (currentShipPlace)
                     {
                         break;
                     }
-                }
-                //checks all ships against the starting point, if there where no coinciding points then it is a safe starting point
-                //now we need to change the next point to check for the placement ship. This is where we need to consider horizontal or vertical
-                
-                //if there is no current ship place corisponding to future place of the chip to be placed... place the ship
-                //set starting point to ship
-                Ocean[startX, startY].PointStatus = Point.Status.Ship;
 
-                //Add point to list within the ship
-                shipToPlace.OccupiedPoints.Add(Ocean[startX, startY]);
+                    if (Random == 0)    //horizontal placement
+                    {
+                        placementX++;
+                    }
+                    else if (Random == 1)       //vertical
+                    {
+                        placementY++;
+                    }
 
-                if (direction == PlaceShipDirection.Horizontal)
+                } 
+                //if we made it this far with currentShipPlace still being false then we have a positive place to put the ship
+                //and we can break the loop getting new numbers
+                if (!currentShipPlace)
                 {
-                    startX++;
+                    break;
                 }
-                else if (direction == PlaceShipDirection.Vertical)
-                {
-                    startY++;
-                }
+
             }
+
+
+
+
+            //if there is no current ship place corisponding to future place of the chip to be placed... place the ship
+            //set starting point to ship
+            Ocean[startX, startY].PointStatus = Point.Status.Ship;
+
+            //Add point to list within the ship
+            shipToPlace.OccupiedPoints.Add(Ocean[startX, startY]);
+
+            if (direction == PlaceShipDirection.Horizontal)
+            {
+                startX++;
+            }
+            else if (direction == PlaceShipDirection.Vertical)
+            {
+                startY++;
+            }
+            
         }
 
         public void DisplayOcean()
